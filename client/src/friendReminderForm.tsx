@@ -74,6 +74,16 @@ export default function FriendReminderForm({
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        if (formData.notes.length === 0) {
+            throw {
+                response: {
+                    status: 400,
+                    data: { message: "At least one note is required." },
+                },
+            }
+        }
+
         try {
             let res;
             if (mode === "create") {
@@ -164,7 +174,7 @@ export default function FriendReminderForm({
                         <div>
                             {formData.notes.map((note, idx) => (
                                 <p key={idx}>
-                                    [{note.date} {note.time}] {note.content}
+                                    {note.content} [{note.date} {note.time}]
                                 </p>
                             ))}
                         </div>

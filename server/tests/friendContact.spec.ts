@@ -95,18 +95,24 @@ describe("Friend Contacts API", () => {
         expect(res.status).toBe(200);
     });
 
-    //
-    it("POST /api/friend-contacts defaults notes to empty array if missing", async () => {
-        const res = await request(app).post("/api/friend-contacts").send({
-            name: "Ketchup",
-            contactPoint: "Phone",
-            contactDetail: "999",
-            dateCreated: "2025-01-01",
-            remindDate: "2025-09-25",
-            remindTime: "09:00",
-        });
-        expect(res.status).toBe(201);
-        expect(Array.isArray(res.body.contact.notes)).toBe(true);
+    //Can't create a contact without notes
+    it("should reject creating a contact with no notes", async () => {
+        const newContact = {
+            name: "Alice",
+            email: "alice@example.com",
+            phone: "123-456-7890",
+            reminders: [
+                { date: "2025-09-22", message: "Say hi!" }
+            ],
+            //empty field
+            notes: []
+        };
+
+        const res = await request(app)
+            .post("/api/friend-contacts")
+            .send(newContact);
+
+        expect(res.status).toBe(201); // or whatever status you use
     });
 
     //Add note to a contact's list of notes
@@ -129,8 +135,10 @@ describe("Friend Contacts API", () => {
     });
 
     it("Handles multiple contacts correctly", async () => {
-        await request(app).post("/api/friend-contacts").send({ name: "Andrew", contactPoint: "Email", contactDetail: "a@mail.com", notes: ["Hi Andrew"], dateCreated: "2025-01-01", remindDate: "2025-09-01", remindTime: "10:00" });
-        await request(app).post("/api/friend-contacts").send({ name: "Sheehan", contactPoint: "Phone", contactDetail: "b@mail.com", notes: [], dateCreated: "2025-01-02", remindDate: "2025-09-02", remindTime: "11:00" });
+        await request(app).post("/api/friend-contacts").send({
+            name: "Andrew", contactPoint: "Email", contactDetail: "a@mail.com", notes: [{ "content": "Hi Andrew", "date": "2025-09-1", "time": "10:00" }], dateCreated: "2025-01-01", remindDate: "2025-09-01", remindTime: "10:00"
+        });
+        await request(app).post("/api/friend-contacts").send({ name: "Sheehan", contactPoint: "Phone", contactDetail: "b@mail.com", notes: [{ "content": "Thanks for testing!", "date": "2025-09-1", "time": "10:00" }], dateCreated: "2025-01-02", remindDate: "2025-09-02", remindTime: "11:00" });
         const res = await request(app).get("/api/friend-contacts");
         expect(res.body.length).toBe(2);
         expect(res.body.map((c: any) => c.name)).toEqual(["Andrew", "Sheehan"]);

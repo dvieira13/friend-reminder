@@ -74,6 +74,7 @@
     background-color: #313131;
     color: #FFF;
     border-radius: 8px;
+    cursor: pointer;
 }
 
 .notes-container {

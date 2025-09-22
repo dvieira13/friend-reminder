@@ -176,7 +176,7 @@ function App() {
                   Notes:
                   <ul>
                     {c.notes.map((n, idx) => (
-                      <li key={idx}>{n.date} {n.time} — {n.content}</li>
+                      <li key={idx}>"{n.content}" - {n.date} {n.time}</li>
                     ))}
                   </ul>
                 </div>
@@ -184,10 +184,7 @@ function App() {
                 <p>Reminder: {c.remindDate} at {c.remindTime}</p>
               </div>
               <div>
-                <button
-                  onClick={() => { setEditContact(c); setShowForm(true); }}
-                  className="update-button"
-                >
+                <button onClick={() => { setEditContact(c); setShowForm(true); }} className="update-button">
                   Update
                 </button>
                 <button onClick={() => c.id && handleDeleteContact(c.id)} className="delete-button">
