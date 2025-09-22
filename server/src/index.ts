@@ -10,6 +10,7 @@ const port = process.env.PORT || 4004;
 
 app.use(cors());
 app.use(express.json());
+// backend router
 app.use("/api/friend-contacts", friendContactsRouter);
 
 // start server only if run directly (not during tests)

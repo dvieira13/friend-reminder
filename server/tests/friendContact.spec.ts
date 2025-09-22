@@ -10,20 +10,23 @@ const resetTestData = () => {
     fs.writeFileSync(dataFile, "[]", "utf-8");
 };
 
+/*Test suite for Friend Contact routes*/
 describe("Friend Contacts API", () => {
     beforeEach(() => resetTestData());
 
+    //loading empty data returns empty data
     it("GET /api/friend-contacts returns empty array initially", async () => {
         const res = await request(app).get("/api/friend-contacts");
         expect(res.status).toBe(200);
         expect(res.body).toEqual([]);
     });
 
+    //create a new contact
     it("POST /api/friend-contacts creates a new contact", async () => {
         const newContact = {
-            name: "Alice",
+            name: "Pickle",
             contactPoint: "Email",
-            contactDetail: "alice@example.com",
+            contactDetail: "pickle@example.com",
             notes: [],
             dateCreated: "2025-01-01",
             remindDate: "2025-09-30",
@@ -31,10 +34,11 @@ describe("Friend Contacts API", () => {
         };
         const res = await request(app).post("/api/friend-contacts").send(newContact);
         expect(res.status).toBe(201);
-        expect(res.body.contact.name).toBe("Alice");
+        expect(res.body.contact.name).toBe("Pickle");
         expect(res.body.contact.id).toBeDefined();
     });
 
+    //GET a created contact
     it("GET returns contacts after POST", async () => {
         const contact = { name: "Bob", contactPoint: "Phone", contactDetail: "123", notes: [], dateCreated: "2025-01-01", remindDate: "2025-10-01", remindTime: "10:00" };
         await request(app).post("/api/friend-contacts").send(contact);
@@ -44,9 +48,10 @@ describe("Friend Contacts API", () => {
         expect(res.body[0].name).toBe("Bob");
     });
 
+    //Update an existing contact
     it("PUT /api/friend-contacts/:id updates an existing contact", async () => {
         const postRes = await request(app).post("/api/friend-contacts").send({
-            name: "Charlie",
+            name: "Mayo",
             contactPoint: "Text",
             contactDetail: "555",
             notes: [],
@@ -55,21 +60,23 @@ describe("Friend Contacts API", () => {
             remindTime: "14:00",
         });
         const id = postRes.body.contact.id;
-        const res = await request(app).put(`/api/friend-contacts/${id}`).send({ name: "Charlie Updated" });
+        const res = await request(app).put(`/api/friend-contacts/${id}`).send({ name: "Mayonnaise" });
         expect(res.status).toBe(200);
-        expect(res.body.contact.name).toBe("Charlie Updated");
+        expect(res.body.contact.name).toBe("Mayonnaise");
     });
 
+    //Update an existing contact that doesn't exist
     it("PUT /api/friend-contacts/:id returns 404 for invalid id", async () => {
         const res = await request(app).put("/api/friend-contacts/invalid-id").send({ name: "X" });
         expect(res.status).toBe(404);
     });
 
+    //Delete a contact from storage
     it("DELETE /api/friend-contacts/:id deletes a contact", async () => {
         const postRes = await request(app).post("/api/friend-contacts").send({
-            name: "Dave",
+            name: "Mustard",
             contactPoint: "Email",
-            contactDetail: "dave@example.com",
+            contactDetail: "mustard@example.com",
             notes: [],
             dateCreated: "2025-01-01",
             remindDate: "2025-12-01",
@@ -82,14 +89,16 @@ describe("Friend Contacts API", () => {
         expect(getRes.body.find((c: any) => c.id === id)).toBeUndefined();
     });
 
+    //Delete a contact from storage that doesn't exist
     it("DELETE /api/friend-contacts/:id returns 200 even if id not found", async () => {
         const res = await request(app).delete("/api/friend-contacts/nonexistent-id");
         expect(res.status).toBe(200);
     });
 
+    //
     it("POST /api/friend-contacts defaults notes to empty array if missing", async () => {
         const res = await request(app).post("/api/friend-contacts").send({
-            name: "Eve",
+            name: "Ketchup",
             contactPoint: "Phone",
             contactDetail: "999",
             dateCreated: "2025-01-01",
@@ -100,9 +109,10 @@ describe("Friend Contacts API", () => {
         expect(Array.isArray(res.body.contact.notes)).toBe(true);
     });
 
+    //Add note to a contact's list of notes
     it("PUT adds new notes to existing notes array", async () => {
         const postRes = await request(app).post("/api/friend-contacts").send({
-            name: "Frank",
+            name: "Cheese",
             contactPoint: "Text",
             contactDetail: "321",
             notes: [],
@@ -119,10 +129,10 @@ describe("Friend Contacts API", () => {
     });
 
     it("Handles multiple contacts correctly", async () => {
-        await request(app).post("/api/friend-contacts").send({ name: "A", contactPoint: "Email", contactDetail: "a@example.com", notes: [], dateCreated: "2025-01-01", remindDate: "2025-09-01", remindTime: "10:00" });
-        await request(app).post("/api/friend-contacts").send({ name: "B", contactPoint: "Phone", contactDetail: "b@example.com", notes: [], dateCreated: "2025-01-02", remindDate: "2025-09-02", remindTime: "11:00" });
+        await request(app).post("/api/friend-contacts").send({ name: "Andrew", contactPoint: "Email", contactDetail: "a@mail.com", notes: ["Hi Andrew"], dateCreated: "2025-01-01", remindDate: "2025-09-01", remindTime: "10:00" });
+        await request(app).post("/api/friend-contacts").send({ name: "Sheehan", contactPoint: "Phone", contactDetail: "b@mail.com", notes: [], dateCreated: "2025-01-02", remindDate: "2025-09-02", remindTime: "11:00" });
         const res = await request(app).get("/api/friend-contacts");
         expect(res.body.length).toBe(2);
-        expect(res.body.map((c: any) => c.name)).toEqual(["A", "B"]);
+        expect(res.body.map((c: any) => c.name)).toEqual(["Andrew", "Sheehan"]);
     });
 });

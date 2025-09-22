@@ -22,10 +22,15 @@ interface ContactData {
 }
 
 function App() {
+  //state for array of ContactData to map into UI
   const [contacts, setContacts] = useState<ContactData[]>([]);
+  //state to track if reminder notifications have been shown
   const [shownReminders, setShownReminders] = useState<Set<string>>(new Set());
+  //state to toggle form visibility
   const [showForm, setShowForm] = useState(false);
+  //state to tell form if it is updating or creating contact
   const [editContact, setEditContact] = useState<ContactData | null>(null);
+  //state for add note field
   const [noteInput, setNoteInput] = useState<string>("");
   const [noteForms, setNoteForms] = useState<Record<string, boolean>>({});
 
@@ -37,7 +42,9 @@ function App() {
     extendedTimeOut: 0,
   };
 
-  // Load contacts from backend
+  /**
+   * renders all contacts from JSON storage on page load
+   */
   useEffect(() => {
     const fetchContacts = async () => {
       try {
@@ -57,7 +64,10 @@ function App() {
     fetchContacts();
   }, []);
 
-  // Reminder checker
+  /**
+   * Reminder checker
+   *  - runs every 5 second to check if any contacts' reminder date/time has occurred in the last 60 seconds
+   */
   useEffect(() => {
     const interval = setInterval(() => {
       const now = new Date();
@@ -77,12 +87,28 @@ function App() {
     return () => clearInterval(interval);
   }, [contacts, shownReminders]);
 
+  /**
+   * 
+   * @param contact as CotactData
+   * updates contact state with new contaxt
+   */
   const handleAddContact = (contact: ContactData) =>
     setContacts((prev) => [...prev, contact]);
 
+  /**
+   * 
+   * @param contact as CotactData
+   * updates contact by id value
+   */
   const handleUpdateContact = (contact: ContactData) =>
     setContacts((prev) => prev.map((c) => (c.id === contact.id ? contact : c)));
 
+  /**
+   * 
+   * @param id as string
+   * gets id from contact-item and sends that to backend to delete contact
+   * setContacts(removes contact from UI)
+   */
   const handleDeleteContact = async (id: string) => {
     try {
       const res = await fetch(`/api/friend-contacts/${id}`, { method: "DELETE" });
@@ -93,11 +119,22 @@ function App() {
     }
   };
 
+  /**
+   * 
+   * @param id as string
+   * toggles form to add a note, always with a cleared input
+   */
   const toggleNoteForm = (id: string) => {
     setNoteForms((prev) => ({ ...prev, [id]: !prev[id] }));
     setNoteInput("");
   };
 
+  /**
+   * 
+   * @param contact as contactData
+   * @param note as ContactNote
+   * updates contact in JSON storage by id, replaces whole contact with data from form
+   */
   const handleNewNote = async (contact: ContactData, note: ContactNote) => {
     const updatedContact = { ...contact, notes: [...contact.notes, note] };
     try {
@@ -108,6 +145,7 @@ function App() {
       });
       if (!res.ok) throw new Error("Failed to update contact");
       const data = await res.json();
+      //updates contacts in UI
       handleUpdateContact(data.contact);
       toggleNoteForm(contact.id!);
     } catch (err) {
@@ -119,15 +157,8 @@ function App() {
     <>
       <h1>Friend Reminder</h1>
 
-      <button
-        onClick={() => {
-          setEditContact(null);
-          setShowForm(true);
-        }}
-        className="generate-button"
-      >
-        Create New Contact
-      </button>
+      {/* shows form, and sets edit notifier to null */}
+      <button onClick={() => { setEditContact(null); setShowForm(true); }} className="generate-button">Create New Contact</button>
 
       <div className="contact-container">
         {[...contacts]

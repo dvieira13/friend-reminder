@@ -6,7 +6,9 @@ const router = express.Router();
 const dataFile = path.join(__dirname, "../data/friendContacts.json");
 
 // Ensure JSON file exists
-if (!fs.existsSync(dataFile)) fs.writeFileSync(dataFile, "[]", "utf-8");
+if (!fs.existsSync(dataFile)) {
+    fs.writeFileSync(dataFile, "[]", "utf-8");
+}
 
 interface ContactNote {
     content: string;
@@ -25,7 +27,10 @@ interface FriendContact {
     remindTime: string;
 }
 
-// Helper to load contacts
+/**
+ * Helper to load contacts from JSON storage
+ * @returns an array of FriendConact's
+ */
 const loadContacts = (): FriendContact[] => {
     const data = fs.readFileSync(dataFile, "utf-8");
     return JSON.parse(data).map((c: any) => ({
@@ -34,12 +39,18 @@ const loadContacts = (): FriendContact[] => {
     }));
 };
 
-// Helper to save contacts
+/**
+ * Helper to save contacts in JSON storage
+ * @param contacts 
+ */
 const saveContacts = (contacts: FriendContact[]) => {
     fs.writeFileSync(dataFile, JSON.stringify(contacts, null, 2), "utf-8");
 };
 
-// GET all contacts
+/**
+ * ROUTE-
+ * GET all contacts from JSON storage
+ */
 router.get("/", (req: Request, res: Response) => {
     try {
         const contacts = loadContacts();
@@ -50,7 +61,11 @@ router.get("/", (req: Request, res: Response) => {
     }
 });
 
-// POST create contact
+
+/**
+ * ROUTE-
+ * POST create contact in JSON storage
+ */
 router.post("/", (req: Request, res: Response) => {
     try {
         const contacts = loadContacts();
@@ -68,7 +83,10 @@ router.post("/", (req: Request, res: Response) => {
     }
 });
 
-// PUT update contact
+/**
+ * ROUTE-
+ * PUT update contact in JSON storage by contact id
+ */
 router.put("/:id", (req: Request, res: Response) => {
     try {
         const contacts = loadContacts();
@@ -89,7 +107,10 @@ router.put("/:id", (req: Request, res: Response) => {
     }
 });
 
-// DELETE contact
+/**
+ * ROUTE-
+ * DELETE contact in JSON storage by contact id
+ */
 router.delete("/:id", (req: Request, res: Response) => {
     try {
         const contacts = loadContacts();
