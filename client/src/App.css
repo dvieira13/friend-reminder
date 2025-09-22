@@ -2,124 +2,85 @@
   width: 90%;
   margin: 50px auto;
   display: flex;
+  gap: 40px;
   flex-direction: column;
   align-items: center;
-}
-
-.powerball-container {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin: 50px auto 25px;
-  padding: 15px;
-  border-radius: 12px;
-  background-color: rgb(34, 34, 34);
-}
-
-.powerball-container .body-copy {
-  font-size: 43px;
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  margin: auto;
-  height: fit-content;
-  width: fit-content;
-  pointer-events: none;
-}
-
-.powerball-row {
-  display: flex;
-  gap: 8px;
-  justify-content: center;
-  width: 100%;
-}
-
-.ball {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: relative;
-  background: radial-gradient(circle at 30% 30%,
-      /* Position of the light source */
-      #ffffff,
-      /* Bright white for the highlight */
-      #e0e0e0,
-      /* Slightly darker white for the main body */
-      #c0c0c0
-      /* Even darker white for the shadow */
-    );
-  box-shadow:
-    inset -10px -10px 20px rgba(0, 0, 0, 0.2),
-    /* Inner shadow for depth */
-    0px 5px 15px rgba(0, 0, 0, 0.3);
-  /* Outer shadow to lift it off the background */
-  transition: transform .7s ease-in;
-  z-index: 1;
-  animation: pulse 1s infinite;
-}
-
-.ball:hover {
-  /* Opposite effect styles */
-  background: radial-gradient(circle at 70% 70%,
-      #ffffff,
-      #e0e0e0,
-      #c0c0c0);
-  box-shadow:
-    inset 10px 10px 20px rgba(0, 0, 0, 0.2),
-    0px -5px 15px rgba(0, 0, 0, 0.3);
-}
-
-.powerball {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: relative;
-  background: radial-gradient(circle at 30% 30%,
-      /* Position of the light source */
-      #ff0000,
-      /* Bright white for the highlight */
-      #ba0000,
-      /* Slightly darker white for the main body */
-      #560000
-      /* Even darker white for the shadow */
-    );
-  box-shadow:
-    inset -10px -10px 20px rgba(0, 0, 0, 0.2),
-    /* Inner shadow for depth */
-    0px 5px 15px rgba(0, 0, 0, 0.3);
-  /* Outer shadow to lift it off the background */
-  transition: transform .7s ease-in;
-  z-index: 1;
-  animation: pulse 1s infinite;
-}
-
-.powerball:hover {
-  /* Opposite effect styles */
-  background: radial-gradient(circle at 70% 70%,
-      #ff0000,
-      #ba0000,
-      #560000);
-  box-shadow:
-    inset 10px 10px 20px rgba(0, 0, 0, 0.2),
-    0px -5px 15px rgba(0, 0, 0, 0.3);
+  font-family: "Poppins", sans-serif;
 }
 
 .generate-button {
-  width: 150px;
+  width: 220px;
   height: 50px;
-  background-color: rgb(226, 226, 54);
-  font-size: 21px;
+  background-color: rgb(39, 99, 66);
+  font-size: 18px;
+  font-weight: bold;
   border-radius: 8px;
   border: 1px solid #202020;
   cursor: pointer;
+  color: #FFF;
+}
+
+.update-button {
+  width: 100px;
+  height: 40px;
+  background-color: rgb(236 236 0);
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 8px;
+  border: 1px solid #202020;
+  cursor: pointer;
+}
+
+.delete-button {
+  width: 100px;
+  height: 40px;
+  background-color: rgb(227, 58, 58);
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 8px;
+  border: 1px solid #202020;
+  cursor: pointer;
+}
+
+.note-button {
+  width: 100px;
+  height: 40px;
+  background-color: rgb(232, 193, 146);
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 8px;
+  border: 1px solid #202020;
+  cursor: pointer;
+}
+
+.contact-container {
+  width: 90%;
+  max-width: 800px;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.contact-item {
+  background-color: rgb(215 224 255);
+  border: 1px solid rgb(25, 25, 65);
+  border-radius: 8px;
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.contact-item div{
+display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.contact-item p {
+  margin: 0;
+  font-size: 18px;
 }
 
 @media (min-width: 769px) {
