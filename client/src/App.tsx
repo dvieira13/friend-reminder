@@ -26,6 +26,8 @@ function App() {
   const [shownReminders, setShownReminders] = useState<Set<string>>(new Set());
   const [showForm, setShowForm] = useState(false);
   const [editContact, setEditContact] = useState<ContactData | null>(null);
+  const [noteInput, setNoteInput] = useState<string>("");
+  const [noteForms, setNoteForms] = useState<Record<string, boolean>>({});
 
   toastr.options = {
     closeButton: true,
@@ -35,14 +37,18 @@ function App() {
     extendedTimeOut: 0,
   };
 
-  // Load contacts
+  // Load contacts from backend
   useEffect(() => {
     const fetchContacts = async () => {
       try {
         const res = await fetch("/api/friend-contacts");
         if (!res.ok) throw new Error("Failed to fetch contacts");
         const data = await res.json();
-        const normalized = data.map((c: any) => ({ ...c, notes: Array.isArray(c.notes) ? c.notes : [] }));
+        // Ensure notes is always an array
+        const normalized = data.map((c: any) => ({
+          ...c,
+          notes: Array.isArray(c.notes) ? c.notes : [],
+        }));
         setContacts(normalized);
       } catch (err) {
         console.error(err);
@@ -71,7 +77,9 @@ function App() {
     return () => clearInterval(interval);
   }, [contacts, shownReminders]);
 
-  const handleAddContact = (contact: ContactData) => setContacts((prev) => [...prev, contact]);
+  const handleAddContact = (contact: ContactData) =>
+    setContacts((prev) => [...prev, contact]);
+
   const handleUpdateContact = (contact: ContactData) =>
     setContacts((prev) => prev.map((c) => (c.id === contact.id ? contact : c)));
 
@@ -85,19 +93,13 @@ function App() {
     }
   };
 
-  const handleNewNote = async (contact: ContactData) => {
-    const content = prompt("Enter new note:");
-    if (!content) return;
+  const toggleNoteForm = (id: string) => {
+    setNoteForms((prev) => ({ ...prev, [id]: !prev[id] }));
+    setNoteInput("");
+  };
 
-    const now = new Date();
-    const note: ContactNote = {
-      content,
-      date: now.toISOString().split("T")[0],
-      time: now.toTimeString().split(" ")[0],
-    };
-
+  const handleNewNote = async (contact: ContactData, note: ContactNote) => {
     const updatedContact = { ...contact, notes: [...contact.notes, note] };
-
     try {
       const res = await fetch(`/api/friend-contacts/${contact.id}`, {
         method: "PUT",
@@ -107,6 +109,7 @@ function App() {
       if (!res.ok) throw new Error("Failed to update contact");
       const data = await res.json();
       handleUpdateContact(data.contact);
+      toggleNoteForm(contact.id!);
     } catch (err) {
       console.error(err);
     }
@@ -138,24 +141,69 @@ function App() {
               <div>
                 <h3>{c.name}</h3>
                 <p>Contact via: {c.contactPoint} — {c.contactDetail}</p>
-                <p>
+                <div>
                   Notes:
                   <ul>
                     {c.notes.map((n, idx) => (
-                      <li key={idx}>
-                        {n.date} {n.time} — {n.content}
-                      </li>
+                      <li key={idx}>{n.date} {n.time} — {n.content}</li>
                     ))}
                   </ul>
-                </p>
+                </div>
                 <p>Date Created: {c.dateCreated}</p>
                 <p>Reminder: {c.remindDate} at {c.remindTime}</p>
               </div>
               <div>
-                <button onClick={() => { setEditContact(c); setShowForm(true); }} className="update-button">Update</button>
-                <button onClick={() => c.id && handleDeleteContact(c.id)} className="delete-button">Delete</button>
-                <button onClick={() => handleNewNote(c)} className="note-button">Add Note</button>
+                <button
+                  onClick={() => { setEditContact(c); setShowForm(true); }}
+                  className="update-button"
+                >
+                  Update
+                </button>
+                <button onClick={() => c.id && handleDeleteContact(c.id)} className="delete-button">
+                  Delete
+                </button>
+                <button onClick={() => c.id && toggleNoteForm(c.id)} className="note-button">
+                  Add Note
+                </button>
               </div>
+
+              {/* Note form */}
+              {noteForms[c.id!] && (
+                <div className="form-container">
+                  <div className="form-background" onClick={() => toggleNoteForm(c.id!)}></div>
+                  <form
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      if (!noteInput) return;
+                      const now = new Date();
+                      handleNewNote(c, {
+                        content: noteInput,
+                        date: now.toISOString().split("T")[0],
+                        time: now.toTimeString().split(" ")[0],
+                      });
+                      setNoteInput("");
+                    }}
+                    className="contact-form"
+                  >
+                    <h2>Add Note</h2>
+                    <div>
+                      <div>
+                        <input
+                          type="text"
+                          name="note"
+                          value={noteInput}
+                          onChange={(e) => setNoteInput(e.target.value)}
+                          maxLength={512}
+                          required
+                        />
+                      </div>
+                    </div>
+                    <button type="submit" className="submit-button">
+                      Add Note
+                    </button>
+                  </form>
+                </div>
+              )}
             </div>
           ))}
       </div>

@@ -90,3 +90,41 @@
     color: #FFF;
     border-radius: 8px;
 }
+
+@media (max-width: 768px) {
+    h2 {
+        font-size: 21px;
+    }
+
+    .contact-form {
+        width: 85%;
+        padding: 20px 15px 15px;
+        gap: 10px;
+    }
+
+    .contact-form label {
+        font-size: 14px;
+        width: 60px;
+    }
+
+    .contact-form input,
+    .contact-form textarea,
+    .contact-form select {
+        font-size: 16px;
+    }
+
+    .contact-form>div {
+        gap: 10px;
+    }
+
+    .notes-container button {
+        font-size: 12px;
+        height: 25px;
+    }
+
+    .submit-button {
+        font-size: 16px;
+        font-weight: bold;
+        height: 40px;
+    }
+}
